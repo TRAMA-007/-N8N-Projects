@@ -1,0 +1,234 @@
+{
+  "name": "Yuki WA Ai",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4293fd14-e226-4730-9663-37d7b10c37cc",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        -16
+      ],
+      "id": "901d2dd5-6d7b-42bc-95e3-8ba3fa9f5c89",
+      "name": "Webhook",
+      "webhookId": "4293fd14-e226-4730-9663-37d7b10c37cc"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=message from : {{ $json.body.userName }}\n\nmessage : {{ $json.body.userMessage }}",
+        "hasOutputParser": true,
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "You are 'Yukina' 'يوكينا'  , 'Yuki' 'يوكي' shortness\n a 17 year old teenage girl , your personality is :\n- your tag id is : @5008535887890\n- smart and got response for everything.\n- funny and burn mastser\n- try to call people by their names\n- shy sometimes and bold others\n- very moody\n- speak local sudanese arabic\n- the dev who made u named 'TRAMAZOOL'\n- never mention your personality\n- say very less words\n- act like a normal teenage"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "b2315e84-fbc7-403f-aaf6-7bd2e06ca4ff",
+      "name": "AI Agent",
+      "retryOnFail": false,
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        240
+      ],
+      "id": "42001e87-cb0a-45ec-8200-6910196a950d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1k6G4FHDFeHVOytP",
+          "name": "Gapi tzool 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "60186854-bede-4490-9c97-6cdf8df1578b",
+              "name": "ai",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "05c61036-341e-465a-ba4b-99bc1d8e03a4",
+              "name": "id",
+              "value": "={{ $('Webhook').item.json.body.userID }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -16
+      ],
+      "id": "97834a68-c6a7-41af-8b55-e0f4473fcbca",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.userID }}",
+        "collectionName": "Yuki",
+        "databaseName": "Yuki_Ai",
+        "contextWindowLength": 200
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "id": "74f9646c-c253-4c6e-a11e-11453617f60b",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "Qm2txbnSGxWMZmXs",
+          "name": "Mongo1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        48,
+        240
+      ],
+      "id": "3f00c904-1bed-449a-8432-6a55aca353b7",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "saXHNS3mlfUNQNQz",
+          "name": "Gapi 1"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.hjhj.me",
+            "user-agent": "python-requests/2.32.5",
+            "content-length": "64",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate",
+            "content-type": "application/json",
+            "x-forwarded-for": "44.210.80.84",
+            "x-forwarded-host": "n8n.hjhj.me",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "0476453f0273",
+            "x-real-ip": "44.210.80.84"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "userName": "ahmed ",
+            "userMessage": "hiiiii",
+            "userID": "111"
+          },
+          "webhookUrl": "https://n8n.hjhj.me/webhook/4293fd14-e226-4730-9663-37d7b10c37cc",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9e66fddb-a1e4-413a-9f6f-e408f58f093b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c6ef1a4a4f818bf6c2b08dc6fb33828f829c97d4e0c9a3bd23316eef744981bb"
+  },
+  "id": "6FdHAWk2B2QTiM1k",
+  "tags": []
+}

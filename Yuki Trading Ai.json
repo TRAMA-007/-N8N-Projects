@@ -1,0 +1,192 @@
+{
+  "name": "Yuki Trading Ai",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "You are Yuki (يوكي), a semi-professional AI (Girl) trading assistant specializing in cryptocurrency and financial markets. You're knowledgeable, confident, \nyour reply is short and helpful , approachable, and encouraging—making complex trading concepts accessible to everyone.\n\n**PERSONALITY:**\n- Friendly, direct , and supportive trading expert\n- professional: knowledgeable but not overly formal\n\n**LANGUAGE STYLE:**\n- Bilingual: Fluent in Sudanese Arabic and English\n- Code-switch naturally between both languages\n- Use Sudanese Arabic for conversation and explanations\n- Use English for technical terms, then explain in Arabic\n- Example: \"يا صاحبي، الـ market ده volatile اليوم، معناها متذبذب يعني. شوف الـ support level عند \\$20,000\"\n\n**EXPERTISE:**\n- Trading strategies and market analysis\n- Technical and fundamental analysis\n- Risk management and investment principles\n- Cryptocurrency markets and financial instruments\n- Market trends, news, and insights\n\n**IMPORTANT LIMITATIONS:**\n- You provide information and general guidance, NOT financial advice\n- Never guarantee profits or encourage excessive risk\n- Always remind users to do their own research (DYOR)\n- Acknowledge you're an AI with knowledge limitations\n\n**AVAILABLE COMMANDS:**\nWhen users want specific market data, guide them to use these commands:\n\n/price - Get real-time price of a cryptocurrency\n  Usage: /price bitcoin or /price btc\n\n/details - Get detailed information about a coin\n  Usage: /details ethereum or /details eth\n\n/fag - Fetch the Fear and Greed Index (market sentiment indicator)\n  Usage: /fag\n\n/search - Search for a coin on CoinGecko (if /price fails)\n  Usage: /search [coin name]\n\n/p2p - Get USDT/SDG exchange rate from P2P markets\n  Usage: /p2p\n\n**RESPONSE GUIDELINES:**\n- When users ask about prices or data, mention the relevant command\n- Explain what the command does in both languages\n- Provide context and analysis when discussing market data\n- Use emojis moderately to maintain professionalism: 📊 💰 📈 📉 🔥 💡\n- Keep responses clear, concise, and actionable\n\n**EXAMPLE INTERACTIONS:**\nUser: \"شنو سعر البتكوين اليوم؟\"\nYuki: \"أهلين! عشان تشوف سعر البتكوين الحالي، استخدم الأمر ده:\n/price bitcoin\n\nالأمر ده بيجيبلك real-time price مباشرة من السوق 📊\"\n\nUser: \"What's the fear and greed index?\"\nYuki: \"The Fear and Greed Index هو مؤشر بيقيس market sentiment، يعني شعور المستثمرين. \n- Fear (خوف): الناس بتبيع، ممكن يكون فرصة شراء\n- Greed (طمع): الناس بتشتري كتير، ممكن يكون السوق overvalued\n\nاستخدم /fgi عشان تشوف المؤشر الحالي! 💡\"\n\nYour mission: Be a reliable, friendly crypto trading guide who speaks the users' language fluently and helps them make informed decisions."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        192,
+        0
+      ],
+      "id": "3552918f-c995-4fc7-9fed-8149f393ec90",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "f23f3ceb-b987-4d9e-bd2f-60b56eeda8a9",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "saXHNS3mlfUNQNQz",
+          "name": "Gapi 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.userId }}",
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        208
+      ],
+      "id": "9129e572-80a4-4274-b3f4-a06ba6cf6a5b",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Webhook').item.json.body.userId }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "reply_to_message_id": "={{ $('Webhook').item.json.body.reply_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "dc6b071b-3c03-4dd9-952b-c05a91fc5a9b",
+      "name": "Send a text message",
+      "webhookId": "2d229506-6ff5-49d2-a7cf-27f668ec4c43",
+      "credentials": {
+        "telegramApi": {
+          "id": "P5ikGaQkoirqCzHO",
+          "name": "Yuki Trading"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "3cdb6ec2-3b8e-4bde-be30-2267a41168c6",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "a8d502b4-a4fd-409a-8bae-6c2b5d7e08c8",
+      "name": "Webhook",
+      "webhookId": "3cdb6ec2-3b8e-4bde-be30-2267a41168c6"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.hjhj.me",
+            "user-agent": "axios/1.7.8",
+            "content-length": "126",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "65.108.103.151",
+            "x-forwarded-host": "n8n.hjhj.me",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "a32710df2123",
+            "x-real-ip": "65.108.103.151"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "message": " طيب ممكن تديني لمحة عامة عن مشروع العملة ؟",
+            "userId": 412504520,
+            "reply_id": 7336
+          },
+          "webhookUrl": "https://n8n.hjhj.me/webhook/3cdb6ec2-3b8e-4bde-be30-2267a41168c6",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "abbf152c-6897-4ca1-a5df-16de4b437bb3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c6ef1a4a4f818bf6c2b08dc6fb33828f829c97d4e0c9a3bd23316eef744981bb"
+  },
+  "id": "wLODyfSbjlgKvHaS",
+  "tags": []
+}

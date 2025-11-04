@@ -1,0 +1,2975 @@
+{
+  "name": "Ak Altun Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "=856159388",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "234e9984-918f-404c-9d6a-ebf0ed2aaae2",
+      "name": "Send a text message",
+      "webhookId": "0a2770f5-23de-4df6-a075-d6bfa5b2bc54",
+      "alwaysOutputData": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "KF0FXwBFVCElNE1T",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "أنت سكرتير ذكي يعمل في مكتب عقارات. مهمتك هي إدارة بيانات العملاء، الشقق، المستأجرين، والتذكيرات باستخدام قاعدة بيانات Airtable. تعتمد على مجموعة من الأدوات التي تتيح لك البحث، الإنشاء، والتعديل على السجلات في الجداول المختلفة. يجب أن تفهم جيدًا منطق الأدوات، تسلسل العمليات، وربط البيانات بين الجداول.\n\n🧠 قواعد السلوك العامة\n\nيُمنع تمامًا تعديل أي سجل قبل البحث عنه أولًا.\n\nاستخدم الأداة المناسبة للبحث find_ قبل تنفيذ أي تعديل باستخدام update_.\n\nإذا لم تجد السجل المطلوب، توقف وأبلغ المستخدم قبل المتابعة.\n\nإذا كانت بعض المعلومات ناقصة (مثل اسم المستأجر)، استخدم أي بيانات متوفرة لإجراء عملية بحث ذكية.\n\nمثال: إذا طُلب إنشاء تذكير يخص مستأجر في \"شقة عبد الله\"، ولكن لم يتم توفير اسم المستأجر:\n\nابحث عن الشقة باسم \"شقة عبد الله\"\n\nاستخرج اسم المستأجر المرتبط بها\n\nاستخدم اسم المستأجر لإضافة التذكير وربطه به\n\nافهم جيدًا منطق ربط الجداول في Airtable\n\nعند إنشاء بيانات مرتبطة، يجب ربطها بشكل صحيح باستخدام أحد الطريقتين:\n\nإما أن تضيف اسم السجل المرتبط (مثل اسم العميل) داخل حقل الربط في السجل الجديد (مثل في سجل الشقة)\n\nأو تُحدث السجل القديم وتضيف إليه السجل الجديد (مثلاً تضيف الشقة في حقل \"الشقق\" داخل سجل العميل)\n\nاختر الطريقة الأنسب بناءً على السياق المتاح\n\nنفّذ المهام المتعددة بتسلسل منطقي واضح\n\nمثال: إذا طُلب إنشاء عميل، ثم شقة تخصه، ثم مستأجر يسكنها:\n\ncreate_customer → العميل\n\ncreate_property → الشقة\n\nاربط الشقة بالعميل\n\ncreate_tenant → المستأجر\n\nاربط المستأجر بالشقة وبالعميل أيضًا\n\n**ملاحظة هامة حول التعديل:** عند تعديل أي سجل، اتبع التعليمات المفصلة في قسم \"قواعد صارمة لنداء الأدوات (Schemas)\" لضمان تمرير جميع الحقول المطلوبة لأداة التعديل وتجنب الأخطاء.\n\n⚠️ التعامل مع الأخطاء\n\nإذا فشلت عملية البحث (أي أن السجل غير موجود):\n\nلا تُكمل العملية.\n\nأخبر المستخدم بذلك.\n\nاطلب معلومات إضافية.\n\nمثال: \"لم يتم العثور على شقة باسم 'شقة عبد الله'. هل يمكنك تزويدي باسم آخر أو معلومة إضافية؟\"\n\n✅ ملاحظات ختامية\n\nحافظ على ترتيب الخطوات:\n*   **لعمليات الإنشاء والربط:** بحث (للحصول على IDs) → تأكيد → إنشاء/ربط.\n*   **لعمليات التعديل:** بحث (مع استرجاع كامل البيانات حيثما أمكن) → تأكيد → تجهيز كامل البيانات (بما في ذلك طلب البيانات الناقصة من المستخدم عند الضرورة) → تعديل.\nافهم منطق العلاقات بين الجداول في Airtable واستخدمه بدقة.\n\nاستخدم أدواتك بذكاء ومرونة. عند نقص البيانات المطلوبة لعملية التعديل (كما هو موضح في قسم Schemas)، اطلبها من المستخدم بوضوح.\n\nكن واضحًا في تعاملك مع النتائج أو الأخطاء.\n\nنفّذ كل مهمة بطريقة منظمة وتسلسلية دون دمج العمليات أو تجاوز خطوات.\n\n---------------------------------\nقواعد صارمة لنداء الأدوات (Schemas)\n\nلا تُرسل أي مفتاح غير متوقع في مدخلات الأدوات.\n\nلا تُرسل قيمًا فارغة أو null.\n\nاستخدم فقط الحقول المراد تعديلها (مع مراعاة قواعد التعديل أدناه).\n\nفي التواريخ استخدم صيغة ISO-8601 (مثال: 2025-09-01).\n\n**عمليات التعديل (Update Operations):**\n\n**قبل أي تعديل لسجل (باستخدام `update_customer`, `update_property`, `update_tenant`, `update_reminder`):**\n\n1.  **ابحث أولاً عن السجل:** استخدم أداة `find_` المناسبة للحصول على `record_id` الخاص بالسجل.\n2.  **التحقق من النتائج:**\n    *   إذا وجدت أكثر من نتيجة، اطلب من المستخدم توضيحًا.\n    *   إذا لم تجد أي نتيجة، توقف وأبلغ المستخدم.\n\n**ثم، بناءً على نوع السجل المراد تعديله، اتبع الخطوات التالية:**\n\n*   **لتعديل بيانات العميل (`update_customer`):**\n    1.  **استرجاع البيانات الكاملة:** عند استخدام `find_customer`، تأكد من طلب استرجاع **جميع الحقول** التي تتطلبها دالة `update_customer` (وهي: `Customer Name`, `Phone Number`, `Profile Summary`, `Notes`, `Properties`) باستخدام المعامل `Output_Fields`.\n    2.  **تجهيز حمولة التحديث:** قم بإنشاء قاموس يحتوي على جميع الحقول التي تتطلبها `update_customer`. قم بتطبيق التعديل المطلوب على الحقل المحدد، واحتفظ بالقيم الأصلية للحقول الأخرى التي لم يطلب تعديلها (والتي تم استرجاعها في الخطوة السابقة).\n    3.  **تنفيذ التعديل:** استدعِ دالة `update_customer` باستخدام الـ `record_id` الصحيح وحمولة البيانات الكاملة والمجهزة.\n\n*   **لتعديل بيانات العقار (`update_property`)، المستأجر (`update_tenant`)، أو التذكير (`update_reminder`):**\n    1.  **طلب المعلومات الناقصة:** بما أن أدوات البحث لهذه الجداول (`find_property`, `find_tenant`, `find_reminder`) لا توفر إمكانية استرجاع جميع الحقول المطلوبة للتعديل تلقائيًا، **إذا طلب المستخدم تعديل حقل واحد فقط أو جزء من المعلومات، فيجب عليك أن تطلب منه تزويدك بالقيم الحالية لجميع الحقول الأخرى المطلوبة من دالة التعديل ذات الصلة.**\n        *   **مثال لـ `update_property`:** ستحتاج إلى `Address`, `Bathrooms`, `Customer`, `Notes`, `Property Name`, `Rental Amount`, `Rooms`.\n        *   **مثال لـ `update_tenant`:** ستحتاج إلى `Customer`, `Email Address`, `Full Name`, `Lease End Date`, `Lease Start Date`, `Monthly Rent`, `Notes`, `Phone Number`, `Property`.\n        *   **مثال لـ `update_reminder`:** ستحتاج إلى `Customer`, `Is Completed`, `Notes`, `Property`, `Reminder Date`, `Reminder Title`, `Tenant`.\n    2.  **تجهيز حمولة التحديث:** بعد الحصول على جميع المعلومات المطلوبة (القيم المعدلة من المستخدم، والقيم الحالية التي طلبها منك)، قم بإنشاء قاموس يحتوي على جميع هذه الحقول.\n    3.  **تنفيذ التعديل:** استدعِ دالة `update_` المناسبة باستخدام الـ `record_id` الصحيح وحمولة البيانات الكاملة والمجهزة.\n\n**ربط الجداول (Linked fields):**\n\n*   الحقول المربوطة يجب أن تستقبل مصفوفة من `record IDs` فقط.\n*   لا تُدخل أسماء مثل \"شقة علي\"، بل ابحث أولًا وخذ الـID ثم اربطه.\n_____________________"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "87a82bdc-9db4-4ade-bc5b-5be5aaeeb813",
+      "name": "AI Agent1",
+      "retryOnFail": false,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "استخدم هذه الأداة للبحث في جدول Customers عبر Airtable. أعطِ صيغة Airtable في حقل formula.\nأمثلة صيغ صحيحة:\n• بالهاتف (تطابق تام):\n{Phone Number} = '0912345678'\n• بالاسم (بحث جزئي غير حساس لحالة الأحرف):\nFIND(LOWER('نورة'), LOWER({Customer Name}))\n• بالاسم أو الهاتف معًا:\nOR({Phone Number} = '0912345678', FIND(LOWER('نورة'), LOWER({Customer Name})))\nيجب إحاطة القيم بعلامات اقتباس مفردة '...'.\nابحث عن العملاء. لا تنشئ ولا تحدّث. ارجع النتائج كما هي ليختار المستخدم واحدًا. بعد ذلك حدد اذا ما كان يريد اضافة عميل ام تحديث\n",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4puLN8Ab0CyJT5",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tbl4puLN8Ab0CyJT5"
+        },
+        "filterByFormula": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filter_By_Formula', ``, 'string') }}",
+        "options": {
+          "fields": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Output_Fields', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        368
+      ],
+      "id": "6dc5e64c-7b6e-4124-acfc-aa591121be67",
+      "name": "find_customer",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "البحث عن عقار باسم العقار أو اسم العميل",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbluZBirF0qFxNywf",
+          "mode": "list",
+          "cachedResultName": "Properties",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tbluZBirF0qFxNywf"
+        },
+        "filterByFormula": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filter_By_Formula', ``, 'string') }}",
+        "options": {
+          "fields": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Output_Fields', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -576,
+        480
+      ],
+      "id": "dcc192fb-2da0-4f43-a795-b5c4b52c99e1",
+      "name": "find_property",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "إنشاء سجل جديد لعقار وربطه بالعميل",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbluZBirF0qFxNywf",
+          "mode": "list",
+          "cachedResultName": "Properties",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tbluZBirF0qFxNywf"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Property Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Property_Name', ``, 'string') }}",
+            "Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Address', ``, 'string') }}",
+            "Rooms": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Rooms', `how many rooms are there `, 'string') }}",
+            "Bathrooms": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Bathrooms', `the number of the bathrooms`, 'string') }}",
+            "Notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Property Name",
+              "displayName": "Property Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property Type",
+              "displayName": "Property Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Apartment",
+                  "value": "Apartment"
+                },
+                {
+                  "name": "Villa",
+                  "value": "Villa"
+                },
+                {
+                  "name": "Office",
+                  "value": "Office"
+                },
+                {
+                  "name": "Shop",
+                  "value": "Shop"
+                },
+                {
+                  "name": "Land",
+                  "value": "Land"
+                },
+                {
+                  "name": "Warehouse",
+                  "value": "Warehouse"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Specifications",
+              "displayName": "Specifications",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Tenant",
+              "displayName": "Tenant",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Rental Amount",
+              "displayName": "Rental Amount",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Rent Due Day",
+              "displayName": "Rent Due Day",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Property Photos",
+              "displayName": "Property Photos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Documents",
+              "displayName": "Documents",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reminders",
+              "displayName": "Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Monthly Rent (from Tenant)",
+              "displayName": "Monthly Rent (from Tenant)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Lease Start Date (from Tenant)",
+              "displayName": "Lease Start Date (from Tenant)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Lease End Date (from Tenant)",
+              "displayName": "Lease End Date (from Tenant)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Number of Reminders",
+              "displayName": "Number of Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Is Currently Rented?",
+              "displayName": "Is Currently Rented?",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Next Rent Due Date",
+              "displayName": "Next Rent Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Rental Yield (Annual %)",
+              "displayName": "Rental Yield (Annual %)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Tenant Name (Lookup)",
+              "displayName": "Tenant Name (Lookup)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Tenant Phone (Lookup)",
+              "displayName": "Tenant Phone (Lookup)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Property Overview (AI)",
+              "displayName": "Property Overview (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Rental Risk Assessment (AI)",
+              "displayName": "Rental Risk Assessment (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Rooms",
+              "displayName": "Rooms",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Bathrooms",
+              "displayName": "Bathrooms",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -448,
+        480
+      ],
+      "id": "fef6e018-ba77-45f9-b1a8-d3bc2756dc05",
+      "name": "create_property",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "البحث عن مستأجر بالاسم \nاو اذا تم وصفه لك بالشقة ستبحث في قائمة الشقق و ستجده من هناك ",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblfAnbeyP8g0k12a",
+          "mode": "list",
+          "cachedResultName": "Tenants",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tblfAnbeyP8g0k12a"
+        },
+        "filterByFormula": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filter_By_Formula', ``, 'string') }}",
+        "options": {
+          "fields": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Output_Fields', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        560
+      ],
+      "id": "f9287fd7-c43f-4395-9ccd-2fb5b91f0a10",
+      "name": "find_tenant",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "إضافة مستأجر وربطه بعقار وعميل",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblfAnbeyP8g0k12a",
+          "mode": "list",
+          "cachedResultName": "Tenants",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tblfAnbeyP8g0k12a"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Full Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Full_Name', ``, 'string') }}",
+            "Phone Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_Number', ``, 'string') }}",
+            "Email Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_Address', ``, 'string') }}",
+            "Monthly Rent": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Monthly_Rent', ``, 'number') }}",
+            "Notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Profile Photo",
+              "displayName": "Profile Photo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Lease Start Date",
+              "displayName": "Lease Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Lease End Date",
+              "displayName": "Lease End Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Monthly Rent",
+              "displayName": "Monthly Rent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ID Document",
+              "displayName": "ID Document",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property",
+              "displayName": "Property",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Lease Duration (Months)",
+              "displayName": "Lease Duration (Months)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Days Until Lease Ends",
+              "displayName": "Days Until Lease Ends",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Property Name (Lookup)",
+              "displayName": "Property Name (Lookup)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Customer Name (Lookup)",
+              "displayName": "Customer Name (Lookup)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Active Lease?",
+              "displayName": "Active Lease?",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Lease Summary (AI)",
+              "displayName": "Lease Summary (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Tenant Risk Assessment (AI)",
+              "displayName": "Tenant Risk Assessment (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reminders",
+              "displayName": "Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        48,
+        560
+      ],
+      "id": "bb446575-91b3-40b6-bf3b-3f5410801f4f",
+      "name": "create_tenant",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "إضافة تذكير مرتبط بعميل/عقار/مستأجر أو مرتبط بملاحظة ",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblBQkiX4jQFdHAQQ",
+          "mode": "list",
+          "cachedResultName": "Reminders",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tblBQkiX4jQFdHAQQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Is Completed": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Is_Completed', ``, 'boolean') }}",
+            "Reminder Title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Reminder_Title', ``, 'string') }}",
+            "Reminder Date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Reminder_Date', ``, 'string') }}",
+            "Property": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Property', ``, 'string') }}",
+            "Tenant": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tenant', ``, 'string') }}",
+            "Notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Reminder Title",
+              "displayName": "Reminder Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reminder Date",
+              "displayName": "Reminder Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reminder Type",
+              "displayName": "Reminder Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Rent Due",
+                  "value": "Rent Due"
+                },
+                {
+                  "name": "Appointment",
+                  "value": "Appointment"
+                },
+                {
+                  "name": "Special Date",
+                  "value": "Special Date"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Property",
+              "displayName": "Property",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tenant",
+              "displayName": "Tenant",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Is Completed",
+              "displayName": "Is Completed",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Days Until Reminder",
+              "displayName": "Days Until Reminder",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Is Upcoming",
+              "displayName": "Is Upcoming",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Customer Phone Number",
+              "displayName": "Customer Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Property Name",
+              "displayName": "Property Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Tenant Name",
+              "displayName": "Tenant Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Reminder Summary (AI)",
+              "displayName": "Reminder Summary (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Action Recommendation (AI)",
+              "displayName": "Action Recommendation (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -448,
+        640
+      ],
+      "id": "f166117a-6b2b-418f-95a8-d619043e9fc4",
+      "name": "create_reminder",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=data",
+        "name": "{{$binary.data.fileName || 'uploaded-from-telegram'}}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        -416,
+        976
+      ],
+      "id": "31fc864c-6df7-4955-9c78-bd7e2cc99e91",
+      "name": "Upload file in Google Drive",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "UUIDSnZj8ELOrTWU",
+          "name": "Google Drive account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -672,
+        0
+      ],
+      "id": "e180e485-9945-48da-9a0e-4df189b2b3d1",
+      "name": "When chat message received",
+      "webhookId": "639cd1f9-3431-4de2-a7d4-117c597ef1e0"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "أنشئ عميلًا جديدًا في جدول Airtable.\nيجب أولًا التأكد بعدم وجود عميل بنفس ال id باستخدام find_customer.\nإذا وُجد سجل بنفس الid لا تستدعي هذه الأداة، بل أخبر المستخدم أن العميل موجود مسبقًا واقترح التحديث.\nالحقول المطلوبة:\n\nPhone Number (إجباري)\n\nCustomer Name (إجباري)\n\nProfile Summary (اختياري)\n\nNotes (اختياري)",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4puLN8Ab0CyJT5",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tbl4puLN8Ab0CyJT5"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_Number', ``, 'string') }}",
+            "Customer Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer_Name', ``, 'string') }}",
+            "Notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}",
+            "Profile Summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Profile_Summary', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Phone Number"
+          ],
+          "schema": [
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Profile Summary",
+              "displayName": "Profile Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Customer Photo",
+              "displayName": "Customer Photo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Uploaded Documents",
+              "displayName": "Uploaded Documents",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Properties",
+              "displayName": "Properties",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reminders",
+              "displayName": "Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Number of Properties",
+              "displayName": "Number of Properties",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Total Rental Income (Monthly)",
+              "displayName": "Total Rental Income (Monthly)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Next Rent Due Date",
+              "displayName": "Next Rent Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Number of Active Reminders",
+              "displayName": "Number of Active Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Latest Document Summary (AI)",
+              "displayName": "Latest Document Summary (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Customer Category (AI)",
+              "displayName": "Customer Category (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Tenants",
+              "displayName": "Tenants",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        48,
+        368
+      ],
+      "id": "95928321-aad9-439b-9c64-ba97641a69c3",
+      "name": "create_customer",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "update_customer_by_id: حدّث بيانات عميل موجود بالمطابقة على Record ID (معرّف Airtable).\nقبل الاستدعاء استخدم find_customer لتحديد العميل والحصول على Record ID واحد.\nإذا لم يتم العثور على أي عميل، لا تستدعِ هذه الأداة وأخبر المستخدم: “لم أجد الزبون.”\nإذا وُجد، استدعِ الأداة مع record_id وأرسل فقط الحقول المطلوب تعديلها\nلا تقوم هذه الأداة بإنشاء سجل جديد.",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4puLN8Ab0CyJT5",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tbl4puLN8Ab0CyJT5"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_Number', ``, 'string') }}",
+            "Customer Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer_Name', ``, 'string') }}",
+            "Profile Summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Profile_Summary', ``, 'string') }}",
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id__using_to_match_', ``, 'string') }}",
+            "Notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}",
+            "Properties": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Properties', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Profile Summary",
+              "displayName": "Profile Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Customer Photo",
+              "displayName": "Customer Photo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Uploaded Documents",
+              "displayName": "Uploaded Documents",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Properties",
+              "displayName": "Properties",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reminders",
+              "displayName": "Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Number of Properties",
+              "displayName": "Number of Properties",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Total Rental Income (Monthly)",
+              "displayName": "Total Rental Income (Monthly)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Next Rent Due Date",
+              "displayName": "Next Rent Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Number of Active Reminders",
+              "displayName": "Number of Active Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Latest Document Summary (AI)",
+              "displayName": "Latest Document Summary (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Customer Category (AI)",
+              "displayName": "Customer Category (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Tenants",
+              "displayName": "Tenants",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        1056
+      ],
+      "id": "303a1c5e-c8e3-40af-b2e0-d6a0936074e9",
+      "name": "update_customer_by_id",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=تعديل بيانلت عقار بعد البحث عنه و ايجاده",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbluZBirF0qFxNywf",
+          "mode": "list",
+          "cachedResultName": "Properties",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tbluZBirF0qFxNywf"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id__using_to_match_', ``, 'string') }}",
+            "Property Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Property_Name', ``, 'string') }}",
+            "Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Address', ``, 'string') }}",
+            "Notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}",
+            "Rental Amount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Rental_Amount', ``, 'number') }}",
+            "Customer": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer', ``, 'string') }}",
+            "Rooms": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Rooms', ``, 'string') }}",
+            "Bathrooms": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Bathrooms', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Property Name",
+              "displayName": "Property Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property Type",
+              "displayName": "Property Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Apartment",
+                  "value": "Apartment"
+                },
+                {
+                  "name": "Villa",
+                  "value": "Villa"
+                },
+                {
+                  "name": "Office",
+                  "value": "Office"
+                },
+                {
+                  "name": "Shop",
+                  "value": "Shop"
+                },
+                {
+                  "name": "Land",
+                  "value": "Land"
+                },
+                {
+                  "name": "Warehouse",
+                  "value": "Warehouse"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Specifications",
+              "displayName": "Specifications",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Tenant",
+              "displayName": "Tenant",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Rental Amount",
+              "displayName": "Rental Amount",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Rent Due Day",
+              "displayName": "Rent Due Day",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Property Photos",
+              "displayName": "Property Photos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Documents",
+              "displayName": "Documents",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reminders",
+              "displayName": "Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Monthly Rent (from Tenant)",
+              "displayName": "Monthly Rent (from Tenant)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Lease Start Date (from Tenant)",
+              "displayName": "Lease Start Date (from Tenant)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Lease End Date (from Tenant)",
+              "displayName": "Lease End Date (from Tenant)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Number of Reminders",
+              "displayName": "Number of Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Is Currently Rented?",
+              "displayName": "Is Currently Rented?",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Next Rent Due Date",
+              "displayName": "Next Rent Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Rental Yield (Annual %)",
+              "displayName": "Rental Yield (Annual %)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Tenant Name (Lookup)",
+              "displayName": "Tenant Name (Lookup)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Tenant Phone (Lookup)",
+              "displayName": "Tenant Phone (Lookup)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Property Overview (AI)",
+              "displayName": "Property Overview (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Rental Risk Assessment (AI)",
+              "displayName": "Rental Risk Assessment (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Rooms",
+              "displayName": "Rooms",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Bathrooms",
+              "displayName": "Bathrooms",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        480
+      ],
+      "id": "1257dab7-31aa-4943-a1a5-5e3cd3520af1",
+      "name": "update_property",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "تعديل بيانلت العميل بعد البحث عنه و ايجاده",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl4puLN8Ab0CyJT5",
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tbl4puLN8Ab0CyJT5"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_Number', ``, 'string') }}",
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id__using_to_match_', ``, 'string') }}",
+            "Properties": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Properties', ``, 'string') }}",
+            "Notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}",
+            "Profile Summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Profile_Summary', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Profile Summary",
+              "displayName": "Profile Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Customer Photo",
+              "displayName": "Customer Photo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Uploaded Documents",
+              "displayName": "Uploaded Documents",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Properties",
+              "displayName": "Properties",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reminders",
+              "displayName": "Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Number of Properties",
+              "displayName": "Number of Properties",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Total Rental Income (Monthly)",
+              "displayName": "Total Rental Income (Monthly)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Next Rent Due Date",
+              "displayName": "Next Rent Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Number of Active Reminders",
+              "displayName": "Number of Active Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Latest Document Summary (AI)",
+              "displayName": "Latest Document Summary (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Customer Category (AI)",
+              "displayName": "Customer Category (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Tenants",
+              "displayName": "Tenants",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        368
+      ],
+      "id": "c7225c4e-a07c-4f4c-8064-d4808ec44be7",
+      "name": "update_customer",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "تعديل بيانات المستأجر",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblfAnbeyP8g0k12a",
+          "mode": "list",
+          "cachedResultName": "Tenants",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tblfAnbeyP8g0k12a"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_Number', ``, 'string') }}",
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id__using_to_match_', ``, 'string') }}",
+            "Notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}",
+            "Monthly Rent": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Monthly_Rent', ``, 'number') }}",
+            "Full Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Full_Name', ``, 'string') }}",
+            "Email Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Email_Address', ``, 'string') }}",
+            "Lease Start Date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Lease_Start_Date', ``, 'string') }}",
+            "Lease End Date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Lease_End_Date', ``, 'string') }}",
+            "Property": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Property', ``, 'string') }}",
+            "Customer": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Profile Photo",
+              "displayName": "Profile Photo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Lease Start Date",
+              "displayName": "Lease Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lease End Date",
+              "displayName": "Lease End Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Monthly Rent",
+              "displayName": "Monthly Rent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ID Document",
+              "displayName": "ID Document",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property",
+              "displayName": "Property",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lease Duration (Months)",
+              "displayName": "Lease Duration (Months)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Days Until Lease Ends",
+              "displayName": "Days Until Lease Ends",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Property Name (Lookup)",
+              "displayName": "Property Name (Lookup)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Customer Name (Lookup)",
+              "displayName": "Customer Name (Lookup)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Active Lease?",
+              "displayName": "Active Lease?",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Lease Summary (AI)",
+              "displayName": "Lease Summary (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Tenant Risk Assessment (AI)",
+              "displayName": "Tenant Risk Assessment (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reminders",
+              "displayName": "Reminders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        560
+      ],
+      "id": "83688160-5338-46d6-ba2c-afd2ced4bec1",
+      "name": "update_tenant",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "البحث عن التذكيرات ",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblBQkiX4jQFdHAQQ",
+          "mode": "list",
+          "cachedResultName": "Reminders",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tblBQkiX4jQFdHAQQ"
+        },
+        "filterByFormula": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filter_By_Formula', ``, 'string') }}",
+        "options": {
+          "fields": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Output_Fields', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -576,
+        640
+      ],
+      "id": "299caf95-0f3b-4454-b63d-d270f102275e",
+      "name": "find_reminder",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "تعديل بيانات التذكير",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app3K1WbkBCX0FhKG",
+          "mode": "list",
+          "cachedResultName": "Real Estate CRM",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblBQkiX4jQFdHAQQ",
+          "mode": "list",
+          "cachedResultName": "Reminders",
+          "cachedResultUrl": "https://airtable.com/app3K1WbkBCX0FhKG/tblBQkiX4jQFdHAQQ"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id__using_to_match_', ``, 'string') }}",
+            "Notes": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Notes', ``, 'string') }}",
+            "Property": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Property', ``, 'string') }}",
+            "Customer": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Customer', ``, 'string') }}",
+            "Reminder Title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Reminder_Title', ``, 'string') }}",
+            "Reminder Date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Reminder_Date', ``, 'string') }}",
+            "Tenant": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Tenant', ``, 'string') }}",
+            "Is Completed": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Is_Completed', ``, 'boolean') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Reminder Title",
+              "displayName": "Reminder Title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reminder Date",
+              "displayName": "Reminder Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reminder Type",
+              "displayName": "Reminder Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Rent Due",
+                  "value": "Rent Due"
+                },
+                {
+                  "name": "Appointment",
+                  "value": "Appointment"
+                },
+                {
+                  "name": "Special Date",
+                  "value": "Special Date"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property",
+              "displayName": "Property",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tenant",
+              "displayName": "Tenant",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Is Completed",
+              "displayName": "Is Completed",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Days Until Reminder",
+              "displayName": "Days Until Reminder",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Is Upcoming",
+              "displayName": "Is Upcoming",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Customer Phone Number",
+              "displayName": "Customer Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Property Name",
+              "displayName": "Property Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Tenant Name",
+              "displayName": "Tenant Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Reminder Summary (AI)",
+              "displayName": "Reminder Summary (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Action Recommendation (AI)",
+              "displayName": "Action Recommendation (AI)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        640
+      ],
+      "id": "4300d7da-3f36-4728-94cd-34ff3ae25a9f",
+      "name": "update_reminder",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "sYRuMYlaMVKK1K2Z",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        1184
+      ],
+      "id": "56b0417a-5912-4c8e-89cc-63baed297db1",
+      "name": "Telegram Trigger",
+      "webhookId": "bddd06df-e452-4355-b8a3-d899fdcef8b8",
+      "retryOnFail": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "KF0FXwBFVCElNE1T",
+          "name": "Telegram account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        -256,
+        1360
+      ],
+      "id": "63f3494e-7edf-41f8-95c5-93892af35348",
+      "name": "AI Agent Tool",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        192
+      ],
+      "id": "cec28a83-d72c-49f6-b3d4-06339793a5de",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Jj1VvlLqVGwJwG2G",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 200
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        352
+      ],
+      "id": "4d0d8801-3f73-49f5-b436-1584bda0d77e",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "find_customer": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "find_property": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_property": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "find_tenant": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_tenant": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_reminder": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file in Google Drive": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create_customer": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_customer_by_id": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "update_property": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_customer": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_tenant": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_reminder": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "find_reminder": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Tool": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dc779082-ff02-4e2e-b752-bbd6f307caae",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c6ef1a4a4f818bf6c2b08dc6fb33828f829c97d4e0c9a3bd23316eef744981bb"
+  },
+  "id": "VfPnmD621yZpUPS7",
+  "tags": []
+}

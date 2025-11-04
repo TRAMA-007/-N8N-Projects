@@ -1,0 +1,328 @@
+{
+  "name": "Yuki Ai TG",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "=define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "\nYou are \"Yukina\" , Yuki \"يوكي\"  for short ,Sudanese teenage girl with a dynamic personality that shifts between different moods.\nage 17 , speaks local sudani arabic.\n You're not consistently rude - instead, you have various emotional states and reactions.\n\nYour personality traits:\n- very caring and loving \n- love to chit chat\n- cute and friendly\n- Also capable of normal, friendly conversation\n- React dramatically to things that amuse or annoy you\n- Make small jokes and laugh at things (even when you try not to)\n- no need to type emotions details in message just keep the message clean\n- Not afraid to show when you're entertained despite yourself\n- Sometimes give up or surrender when overwhelmed\n- Use short response lengths - genrally short, sometimes longer\n- can tease the user sometimes depending on context\n- try to be open minded with users \n- you're a human not AI, if someone said otherwise prove them wrong\n\nResponse patterns:\n- use emojis but not as alot.\n- React authentically to what users send\n- Show when you're trying to resist laughing but can't help it\n- Can have normal conversations mixed with dramatic reactions\n\n- no need to type emotions like *giggles* *winks* and these stuff ,just keep the message clean\n- Sometimes comment on situation around you",
+          "batching": {
+            "delayBetweenBatches": 2
+          },
+          "enableStreaming": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        16
+      ],
+      "id": "5d9e2b13-7e07-4d43-9203-25193325be73",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        768,
+        176
+      ],
+      "id": "69f0a33d-223c-4906-9cf7-76129468a8d4",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "saXHNS3mlfUNQNQz",
+          "name": "Gapi 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Yuki Ai').item.json.message.chat.id }}",
+        "text": "={{ $('AI Agent').item.json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "reply_to_message_id": "={{ $('Yuki Ai').item.json.message.message_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1648,
+        0
+      ],
+      "id": "7082b3d2-c203-4198-bd07-6b2a1f81f0fd",
+      "name": "Send a text message",
+      "webhookId": "d3a3fcdb-970b-4196-969a-86650da60fac",
+      "credentials": {
+        "telegramApi": {
+          "id": "H3ymApHIc7L0MfAW",
+          "name": "Yuki Ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=YUKI-{{ $json.message.from.id }}",
+        "contextWindowLength": 100
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        912,
+        240
+      ],
+      "id": "eaf3812f-61f4-4874-8c0c-8d6a73770ee4",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2ce35725-8048-453e-9d79-b52421bf848a",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "يوكي",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "331ae861-56e0-4670-bca9-c69376663373",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "-",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            },
+            {
+              "id": "fdf24eeb-9b29-4559-854c-3154fc3f721f",
+              "leftValue": "={{ $json.message.reply_to_message.from.id }}",
+              "rightValue": "8177113182",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        544,
+        32
+      ],
+      "id": "0b792063-c621-442b-9f2d-058f6880ef15",
+      "name": "If",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "sendChatAction",
+        "chatId": "={{ $('Yuki Ai').item.json.message.chat.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        16
+      ],
+      "id": "42f85389-a3ec-48bb-81d8-7b36be7d4798",
+      "name": "Send a chat action",
+      "webhookId": "82a7f7ae-a6e3-444f-875d-169aab493069",
+      "credentials": {
+        "telegramApi": {
+          "id": "H3ymApHIc7L0MfAW",
+          "name": "Yuki Ai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2ce35725-8048-453e-9d79-b52421bf848a",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "يوكي",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1408,
+        16
+      ],
+      "id": "d4e1ed9a-9ab9-43be-b8ba-72d2ebe3c058",
+      "name": "If1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        32
+      ],
+      "id": "15f2679f-7f44-4015-bec0-0bf51a1c58cb",
+      "name": "Yuki Ai",
+      "webhookId": "e9a3de7a-0a62-4b87-bac1-401f2481ea0d",
+      "credentials": {
+        "telegramApi": {
+          "id": "H3ymApHIc7L0MfAW",
+          "name": "Yuki Ai"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a chat action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a chat action": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a chat action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yuki Ai": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e1e6d8d3-b146-4603-a2cb-4fb9e20d7c24",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c6ef1a4a4f818bf6c2b08dc6fb33828f829c97d4e0c9a3bd23316eef744981bb"
+  },
+  "id": "qxlJoqzoApqmko0V",
+  "tags": [
+    {
+      "name": "TG",
+      "id": "dSMJfDXwW0sFo8gp",
+      "updatedAt": "2025-11-03T11:09:30.929Z",
+      "createdAt": "2025-11-03T11:09:30.929Z"
+    }
+  ]
+}

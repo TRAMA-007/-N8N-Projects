@@ -1,0 +1,293 @@
+{
+  "name": "Sudan Post",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -96
+      ],
+      "id": "65b6c336-1444-474a-8bb9-4574ed4e8bd0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "saXHNS3mlfUNQNQz",
+          "name": "Gapi 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1002887951390",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "MarkdownV2"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        176
+      ],
+      "id": "4ee6365a-37bb-4537-b7fc-040b1aa6684a",
+      "name": "Send a text message",
+      "webhookId": "1945f40c-d968-42c3-a536-05a87b292455",
+      "credentials": {
+        "telegramApi": {
+          "id": "iX77G86TnYD18yT6",
+          "name": "Sudan Post"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst escapedItems = items.map((item) => {\n  const escapedOutput = item?.json?.output.replace(\n    /([\\\\`*_{}[\\]()#+-.!])/g,\n    \"\\\\$1\",\n  ); // escape markdown characters\n  return { ...item.json, output: escapedOutput };\n});\nreturn escapedItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        80
+      ],
+      "id": "867b08bc-bc21-49cc-a594-88de6e4f939b",
+      "name": "Escape V2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        16,
+        736
+      ],
+      "id": "270f13c2-bbf5-443f-9513-518f8a3f8c6a",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "saXHNS3mlfUNQNQz",
+          "name": "Gapi 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour",
+              "minute": 30
+            }
+          ]
+        },
+        "feedUrl": "https://www.sudaninet.net/feed"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        496
+      ],
+      "id": "0f383955-4c2d-4cd4-b71b-e619f201457f",
+      "name": "SUDANI NET"
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v23.0",
+        "node": "me",
+        "edge": "feed",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $json.output }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        800,
+        464
+      ],
+      "id": "b5dd9eb6-e6e8-4364-94ee-155338b1ff8d",
+      "name": "Sudan Post FB",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "I7eYUs3GWyATQTnj",
+          "name": "Sudan Post FB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.title }}\n\n{{ $json['content:encodedSnippet'] }}\n\n\n{{ $json.pubDate }}",
+        "options": {
+          "systemMessage": "You are a social media content manager for an arabic page, you mange page about latest news and articles.\n\n- you summarize new efficiently.\n- only formal arabic.\n- never use emojis.\n- translate all coming news to arabic and post only arabic (use english nouns if needed).\n\n- if any news came of the sudanese War between RSF and you SAF , you support SAF for good and against RSF.",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -64,
+        464
+      ],
+      "id": "78b2bfb0-945b-40ab-93d8-3ad059ef95d6",
+      "name": "Pro Ai"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.title }}:\n\n{{ $json.contentSnippet }}\n\n{{ $json.pubDate }}",
+        "options": {
+          "systemMessage": "You are a social media content manager for an sudanese arabic page, you mange page about latest news and articles.\n\n- make your news mix of formal and social type of text.\n- use emojis but not alot.\n- translate all coming news to arabic and post only arabic (use english nouns if needed).\n- be a pro content manager and use mix between local sudan arabic and formal.\n\n- if any news came of the sudanese War between RSF and you SAF , you support SAF for good and hate RSF.",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        112
+      ],
+      "id": "b958e143-46c5-4bf7-aad8-36e572199402",
+      "name": "Fun Ai"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour",
+              "minute": 10
+            }
+          ]
+        },
+        "feedUrl": "https://sudanile.com/feed/"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        128
+      ],
+      "id": "9e4a8aa3-0eda-433a-91b4-555c82face4a",
+      "name": "SUDA NILE"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Fun Ai",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escape V2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Pro Ai",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SUDANI NET": {
+      "main": [
+        [
+          {
+            "node": "Pro Ai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pro Ai": {
+      "main": [
+        [
+          {
+            "node": "Sudan Post FB",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Escape V2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fun Ai": {
+      "main": [
+        [
+          {
+            "node": "Escape V2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sudan Post FB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SUDA NILE": {
+      "main": [
+        [
+          {
+            "node": "Fun Ai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a9e7c058-8c1a-4f51-97ba-8c08f842200e",
+  "meta": {
+    "instanceId": "c6ef1a4a4f818bf6c2b08dc6fb33828f829c97d4e0c9a3bd23316eef744981bb"
+  },
+  "id": "zsfuk2i92S7kuvD7",
+  "tags": []
+}

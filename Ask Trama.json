@@ -1,0 +1,222 @@
+{
+  "name": "Ask Trama",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        -16
+      ],
+      "id": "d6c928d6-0da2-48fd-a4e2-a83b3276d4ca",
+      "name": "Telegram Trigger",
+      "webhookId": "2725abc0-cc4d-4ccc-b3c8-009644bd35d5",
+      "credentials": {
+        "telegramApi": {
+          "id": "FwwxUGWUBfwAdz7c",
+          "name": "ASK TRAMA"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.from.id }}",
+        "text": "=تـم تـسـلـيـم رسـالـتـك بـنـجـاح !✅\n\nسـيـتـم الـرد عليك في أقرب وقت ⏳",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        0
+      ],
+      "id": "4f29a607-2624-423b-b63b-bad4ddec90c2",
+      "name": "Send a text message",
+      "webhookId": "74f955eb-6ec1-4519-afcd-21b65f46e8dc",
+      "credentials": {
+        "telegramApi": {
+          "id": "FwwxUGWUBfwAdz7c",
+          "name": "ASK TRAMA"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=412504520",
+        "text": "=📩 وصـلـتـك رسـالـة جـديـدة يـا هـنـدسـة !\n\n📄مـحـتـوى الـرسـالـة:  {{ $('Telegram Trigger').item.json.message.text }}\n\n🕰️ الـتـاريـخ : {{ $json.formattedDate }}",
+        "replyMarkup": "=",
+        "forceReply": {},
+        "replyKeyboardOptions": {},
+        "replyKeyboardRemove": {},
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "328dc97d-cc55-4fde-b2a3-0aec3a4adb77",
+      "name": "Send a text message1",
+      "webhookId": "74f955eb-6ec1-4519-afcd-21b65f46e8dc",
+      "credentials": {
+        "telegramApi": {
+          "id": "FwwxUGWUBfwAdz7c",
+          "name": "ASK TRAMA"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "1759150222",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "bf176f44-794f-43cd-ba35-445e3037771b",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "542ffb96-c1f1-4858-bb43-2ce250a3fcc2",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        -16
+      ],
+      "id": "7905ffe7-a707-4df9-ac0a-dc8ad341dced",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.from.id }}",
+        "text": "=مرحباً بك يا {{ $('Telegram Trigger').item.json.message.from.first_name }} ⭐\n\nانا بـوت مساعد خاص بـ تـرامـا 🕹️\n\nيمكنني توصيل الرسائل له بكل أمان و خصوصية بدون معرفة حسابك 🔐\n\nفقط أرسل رسالتك و دع الباقي لي 💯",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        -144
+      ],
+      "id": "4cd38a2c-c5a2-46e1-a3c5-a0190401f8bb",
+      "name": "Send a text message2",
+      "webhookId": "74f955eb-6ec1-4519-afcd-21b65f46e8dc",
+      "credentials": {
+        "telegramApi": {
+          "id": "FwwxUGWUBfwAdz7c",
+          "name": "ASK TRAMA"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        []
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7b9c8a8e-fb79-4c58-bb92-e550a631b694",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c6ef1a4a4f818bf6c2b08dc6fb33828f829c97d4e0c9a3bd23316eef744981bb"
+  },
+  "id": "PvbCZeRwfV6xGBfI",
+  "tags": []
+}
